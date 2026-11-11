@@ -1,0 +1,432 @@
+/* ===== 기본 변수 / 리셋 ===== */
+:root {
+  color-scheme: dark;
+  --ink: #e8ddbf;
+  --muted: #978e78;
+  --gold: #d7ad62;
+  --line: rgba(233, 214, 169, .22);
+  --panel: rgba(22, 23, 22, .96);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #111518;
+  color: var(--ink);
+  font-family: 'Gowun Dodum', sans-serif;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse at 50% 40%, #263137 0, #13191d 66%, #0c1012 100%);
+}
+
+/* ===== 게임 컨테이너 (16:9 고정 비율) ===== */
+#game {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  overflow: hidden;
+  background: #151b1e;
+  border: 1px solid #404343;
+  box-shadow: 0 24px 90px #000a;
+  image-rendering: pixelated;
+}
+
+canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(14, 40, 56, .22) 0%, transparent 28%, transparent 70%, rgba(8, 10, 14, .7) 100%),
+    radial-gradient(ellipse at center, transparent 42%, rgba(4, 8, 10, .8) 110%);
+}
+
+/* 필름 그레인: game.js가 노이즈 이미지를 배경으로 넣고, 여기서 위치를 튀게 한다 */
+.grain {
+  position: absolute;
+  inset: -96px;
+  pointer-events: none;
+  opacity: .06;
+  mix-blend-mode: overlay;
+  background-size: 96px 96px;
+  animation: grain .35s steps(1) infinite;
+}
+
+@keyframes grain {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-32px, 16px); }
+  50%  { transform: translate(16px, -40px); }
+  75%  { transform: translate(-8px, -16px); }
+  100% { transform: translate(24px, 32px); }
+}
+
+/* ===== 상단 바 ===== */
+.topbar {
+  position: absolute;
+  inset: 18px 22px auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  pointer-events: none;
+  text-shadow: 0 2px 5px #000;
+}
+
+.brand {
+  font: 19px 'Black Han Sans', sans-serif;
+  letter-spacing: .12em;
+  color: #e4d5b3;
+}
+
+.brand small {
+  display: block;
+  margin-top: 5px;
+  font: 10px 'Gowun Dodum', sans-serif;
+  letter-spacing: .22em;
+  color: #b09c77;
+}
+
+.chapter {
+  border-left: 2px solid var(--gold);
+  padding: 2px 0 2px 10px;
+  color: #d7c59f;
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+/* ===== 조작 안내 ===== */
+.help {
+  position: absolute;
+  left: 22px;
+  bottom: 19px;
+  color: #c8bda3;
+  font-size: 12px;
+  background: #111719a8;
+  border: 1px solid #b8a2743b;
+  padding: 8px 11px;
+  letter-spacing: .04em;
+}
+
+.key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 21px;
+  height: 20px;
+  margin-right: 4px;
+  padding: 0 5px;
+  border: 1px solid #c8b7807a;
+  background: #272a28;
+  color: #f2ddaa;
+  box-shadow: 0 2px #050606;
+  font: 11px monospace;
+}
+
+.help span + span { margin-left: 10px; }
+
+/* ===== NPC 근접 안내 ===== */
+.nearby {
+  position: absolute;
+  left: 50%;
+  bottom: 56px;
+  transform: translateX(-50%);
+  padding: 6px 13px;
+  background: #111714df;
+  border: 1px solid #d6b66b66;
+  color: #ead9b1;
+  letter-spacing: .05em;
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
+}
+
+.nearby.show { opacity: 1; }
+
+/* ===== 대화 패널 ===== */
+.dialogue {
+  position: absolute;
+  right: 22px;
+  top: 20px;
+  width: min(395px, 42%);
+  height: min(440px, calc(100% - 40px));
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: var(--panel);
+  border: 1px solid #b69b666e;
+  box-shadow: 0 12px 38px #000b, inset 0 0 0 4px #d4bf8710;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-26px) scaleY(.8);
+  transform-origin: top;
+  transition: opacity .18s, transform .24s cubic-bezier(.16, .85, .25, 1);
+}
+
+.dialogue.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scaleY(1);
+}
+
+.file-head {
+  height: 31px;
+  flex: none;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 12px;
+  background: linear-gradient(90deg, #55422e, #29251f 48%, #202220);
+  font: 11px monospace;
+  letter-spacing: .13em;
+  color: #d6c39b;
+}
+
+.file-head .stamp {
+  border: 1px solid #a85b45;
+  color: #df9276;
+  padding: 2px 5px;
+  transform: rotate(-4deg);
+  font-size: 9px;
+}
+
+.file-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-dialogue {
+  width: 23px;
+  height: 23px;
+  padding: 0;
+  border: 1px solid #c7a66a55;
+  background: #262522;
+  color: #e8d8b7;
+  font: 16px/20px monospace;
+  cursor: pointer;
+}
+
+.close-dialogue:hover {
+  border-color: #eccb83;
+  background: #53432c;
+  color: #ffe8b4;
+}
+
+.file-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px 9px;
+}
+
+.case-meta { display: none; }
+
+.portrait {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border: 1px solid #a58d5d88;
+  background: #20201d;
+  image-rendering: pixelated;
+}
+
+.who {
+  font: 16px 'Black Han Sans', sans-serif;
+  color: #ead9b6;
+}
+
+.role {
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: #a69a7b;
+  margin-top: 4px;
+}
+
+/* ===== 대화 기록 ===== */
+.conversation {
+  flex: 1;
+  min-height: 90px;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 4px 5px 10px;
+  scrollbar-color: #8c744b #242522;
+  scrollbar-width: thin;
+}
+
+.message {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 7px 0 13px;
+  animation: message-in .28s ease-out both;
+}
+
+.message .portrait {
+  position: relative;
+  inset: auto;
+  display: block;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: cover;
+  margin-top: 1px;
+}
+
+.message .speech {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: calc(100% - 57px);
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+/* 플레이어 대사: 오른쪽 정렬 */
+.message.player {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.message.player .speech {
+  background: #c2b9a0;
+  text-align: left;
+}
+
+.message.player .speech:before {
+  left: auto;
+  right: -7px;
+  top: 13px;
+  border-width: 6px 0 6px 7px;
+  border-color: transparent transparent transparent #c2b9a0;
+}
+
+/* 말풍선 */
+.speech {
+  position: relative;
+  min-height: 38px;
+  padding: 8px 12px;
+  background: #d8cfb4;
+  color: #272521;
+  line-height: 1.65;
+  font-size: 13px;
+  box-shadow: 3px 3px #090b0b;
+  white-space: pre-wrap;
+}
+
+.speech:before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: -7px;
+  border-width: 6px 7px 6px 0;
+  border-style: solid;
+  border-color: transparent #d8cfb4 transparent transparent;
+}
+
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== 선택지 ===== */
+.options {
+  flex: none;
+  display: flex;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.option {
+  flex: 1;
+  min-width: 0;
+  min-height: 38px;
+  padding: 7px 8px;
+  border: 1px solid #9e89596b;
+  background: #282824;
+  color: #d5c9ac;
+  font: 12px 'Gowun Dodum', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: .13s;
+}
+
+.option:hover,
+.option.selected {
+  border-color: #e4be6c;
+  background: #4a3e2b;
+  color: #ffe6ad;
+}
+
+.option b {
+  color: #d6ad64;
+  font: 11px monospace;
+  margin-right: 5px;
+}
+
+.continue {
+  flex: none;
+  margin-top: 7px;
+  text-align: right;
+  color: #aa9e82;
+  font: 10px monospace;
+  letter-spacing: .08em;
+}
+
+/* ===== 토스트 ===== */
+.toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 9px 16px;
+  color: #ead7a6;
+  background: #1b1d1bef;
+  border: 1px solid #a98c58;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+  font-size: 13px;
+}
+
+.toast.show { opacity: 1; }
+
+/* ===== 모바일 ===== */
+@media (max-width: 700px) {
+  .dialogue {
+    right: 10px;
+    top: 10px;
+    width: min(380px, 57%);
+    transform: translateY(-20px) scaleY(.8);
+  }
+  .dialogue.open { transform: none; }
+  .topbar { inset: 12px 14px auto; }
+  .brand { font-size: 15px; }
+  .chapter { font-size: 10px; }
+  .help { left: 10px; bottom: 10px; font-size: 10px; }
+  .option { font-size: 10px; padding: 5px; }
+  .file-body { padding: 9px; }
+  .case-meta { padding-bottom: 7px; margin-bottom: 7px; }
+  .speech { font-size: 12px; min-height: 46px; padding: 7px 9px; }
+}

@@ -1,114 +1,53 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>밤의 단서 — 픽셀 탐정 RPG</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Dodum&display=swap');
-:root{color-scheme:dark;--ink:#e8ddbf;--muted:#978e78;--gold:#d7ad62;--line:rgba(233,214,169,.22);--panel:rgba(22,23,22,.96)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111518;color:var(--ink);font-family:'Gowun Dodum',sans-serif}body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#263137 0,#13191d 66%,#0c1012 100%)}
-#game{position:relative;width:min(100vw,calc(100vh * 16 / 9));height:min(100vh,calc(100vw * 9 / 16));overflow:hidden;background:#151b1e;border:1px solid #404343;box-shadow:0 24px 90px #000a;image-rendering:pixelated}
-canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
-.vignette{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#0b10113d 0%,transparent 23%,transparent 72%,#080c10a8 100%),radial-gradient(ellipse at center,transparent 45%,#06090ac2 110%)}
-.topbar{position:absolute;inset:18px 22px auto;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;text-shadow:0 2px 5px #000}
-.brand{font:19px 'Black Han Sans',sans-serif;letter-spacing:.12em;color:#e4d5b3}.brand small{display:block;margin-top:5px;font:10px 'Gowun Dodum',sans-serif;letter-spacing:.22em;color:#b09c77}.chapter{border-left:2px solid var(--gold);padding:2px 0 2px 10px;color:#d7c59f;font-size:12px;letter-spacing:.12em}
-.help{position:absolute;left:22px;bottom:19px;color:#c8bda3;font-size:12px;background:#111719a8;border:1px solid #b8a2743b;padding:8px 11px;letter-spacing:.04em}.key{display:inline-grid;place-items:center;min-width:21px;height:20px;margin-right:4px;padding:0 5px;border:1px solid #c8b7807a;background:#272a28;color:#f2ddaa;box-shadow:0 2px #050606;font:11px monospace}.help span+span{margin-left:10px}
-.nearby{position:absolute;left:50%;bottom:56px;transform:translateX(-50%);padding:6px 13px;background:#111714df;border:1px solid #d6b66b66;color:#ead9b1;letter-spacing:.05em;font-size:13px;opacity:0;transition:opacity .15s;pointer-events:none}.nearby.show{opacity:1}
-.dialogue{position:absolute;right:22px;top:20px;width:min(395px,42%);height:min(440px,calc(100% - 40px));display:flex;flex-direction:column;padding:0;background:var(--panel);border:1px solid #b69b666e;box-shadow:0 12px 38px #000b, inset 0 0 0 4px #d4bf8710;opacity:0;pointer-events:none;transform:translateY(-26px) scaleY(.8);transform-origin:top;transition:opacity .18s,transform .24s cubic-bezier(.16,.85,.25,1);}
-.dialogue.open{opacity:1;pointer-events:auto;transform:translateY(0) scaleY(1)}
-.file-head{height:31px;flex:none;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 12px;background:linear-gradient(90deg,#55422e,#29251f 48%,#202220);font:11px monospace;letter-spacing:.13em;color:#d6c39b}.file-head .stamp{border:1px solid #a85b45;color:#df9276;padding:2px 5px;transform:rotate(-4deg);font-size:9px}.file-actions{display:flex;align-items:center;gap:10px}.close-dialogue{width:23px;height:23px;padding:0;border:1px solid #c7a66a55;background:#262522;color:#e8d8b7;font:16px/20px monospace;cursor:pointer}.close-dialogue:hover{border-color:#eccb83;background:#53432c;color:#ffe8b4}
-.file-body{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 14px 9px}.case-meta{display:none}.portrait{width:52px;height:52px;flex:none;border:1px solid #a58d5d88;background:#20201d;image-rendering:pixelated}.who{font:16px 'Black Han Sans',sans-serif;color:#ead9b6}.role{font-size:10px;letter-spacing:.12em;color:#a69a7b;margin-top:4px}.conversation{flex:1;min-height:90px;overflow-y:auto;overscroll-behavior:contain;padding:4px 5px 10px;scrollbar-color:#8c744b #242522;scrollbar-width:thin}.message{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px auto 14px;max-width:94%;animation:message-in .28s ease-out both}.message .portrait{width:46px;height:46px}.message .speech{max-width:100%;text-align:center}.message.player{align-items:center}.message.player .speech{background:#c2b9a0}.message.player .speech:before{left:calc(50% - 6px);right:auto;border-width:0 6px 7px;border-color:transparent transparent #c2b9a0;top:-7px}.speech{position:relative;min-height:42px;padding:8px 12px;background:#d8cfb4;color:#272521;line-height:1.65;font-size:13px;box-shadow:3px 3px #090b0b;white-space:pre-wrap}.speech:before{content:'';position:absolute;top:-7px;left:calc(50% - 6px);border-width:0 6px 7px;border-style:solid;border-color:transparent transparent #d8cfb4}.options{flex:none;display:flex;gap:6px;margin-top:7px}.option{flex:1;min-width:0;min-height:38px;padding:7px 8px;border:1px solid #9e89596b;background:#282824;color:#d5c9ac;font:12px 'Gowun Dodum',sans-serif;text-align:left;cursor:pointer;transition:.13s}.option:hover,.option.selected{border-color:#e4be6c;background:#4a3e2b;color:#ffe6ad}.option b{color:#d6ad64;font:11px monospace;margin-right:5px}.continue{flex:none;margin-top:7px;text-align:right;color:#aa9e82;font:10px monospace;letter-spacing:.08em}
-@keyframes message-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
-.conversation{width:100%;overflow-x:hidden}.message{width:100%;max-width:100%;min-width:0;flex-direction:row;align-items:flex-start;gap:9px;margin:7px 0 13px}.message .portrait{position:relative;inset:auto;display:block;flex:0 0 42px;width:42px;height:42px;max-width:42px;max-height:42px;object-fit:cover;margin-top:1px}.message .speech{flex:0 1 auto;min-width:0;max-width:calc(100% - 51px);overflow-wrap:anywhere;text-align:left}.message.player{justify-content:flex-end;margin-left:auto}.message.player .speech{background:#c2b9a0;text-align:left}.message.player .speech:before{left:auto;right:-7px;top:13px;border-width:6px 0 6px 7px;border-color:transparent transparent transparent #c2b9a0}.speech{min-height:38px}.speech:before{top:12px;left:-7px;border-width:6px 7px 6px 0;border-color:transparent #d8cfb4 transparent transparent}
-.toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:9px 16px;color:#ead7a6;background:#1b1d1beF;border:1px solid #a98c58;opacity:0;transition:opacity .2s;pointer-events:none;font-size:13px}.toast.show{opacity:1}
-@media(max-width:700px){.dialogue{right:10px;top:10px;width:min(380px,57%);transform:translateY(-20px) scaleY(.8)}.dialogue.open{transform:none}.topbar{inset:12px 14px auto}.brand{font-size:15px}.chapter{font-size:10px}.help{left:10px;bottom:10px;font-size:10px}.option{font-size:10px;padding:5px}.file-body{padding:9px}.case-meta{padding-bottom:7px;margin-bottom:7px}.speech{font-size:12px;min-height:46px;padding:7px 9px}}
-</style></head>
-<body><main id="game" aria-label="밤의 단서 픽셀 RPG 게임 화면"><canvas id="world" width="960" height="540" aria-label="옆에서 보는 밤거리"></canvas><div class="vignette"></div>
-<header class="topbar"><div class="brand">밤의 단서<small>THE NIGHT EXPRESS · MURDER CASE</small></div><div id="chapter" class="chapter">1등칸 &nbsp; / &nbsp; 23:47</div></header>
-<div class="help"><span><i class="key">A</i><i class="key">D</i> 이동</span><span><i class="key">F</i> 대화 · 선택</span></div>
-<div id="nearby" class="nearby">F &nbsp; 대화하기</div>
-<section id="dialogue" class="dialogue" aria-live="polite"><div class="file-head"><span>CASE FILE &nbsp; / &nbsp; FIELD INTERVIEW</span><div class="file-actions"><span class="stamp">EVIDENCE</span><button id="closeDialogue" class="close-dialogue" type="button" aria-label="대화 나가기" title="대화 나가기 (Esc)">×</button></div></div><div class="file-body"><div id="conversation" class="conversation" aria-label="대화 기록"></div><div id="options" class="options"></div><div id="continue" class="continue">ESC / × &nbsp; 대화 나가기</div></div></section>
-<div id="toast" class="toast"></div>
-</main>
-<script>
-(()=>{'use strict';
-// Game state and world data are independent of drawing so more NPCs/events can be added as records.
-const state={playerX:150,cameraX:0,nearbyNpc:null,dialogueNpc:null,dialogueStep:'',choiceIndex:0,lastTime:0,typingTimer:0,typingFinish:null};
-const world={width:4400,floorY:450,viewW:960,viewH:540,player:{w:30,h:48,speed:205},cars:[
- {name:'1등칸',start:0,end:1100,wall:'#332b29',seat:'#622f3b',prop:'suite'},
- {name:'식당칸',start:1100,end:2200,wall:'#3c3027',seat:'#66503a',prop:'dining'},
- {name:'2등칸',start:2200,end:3300,wall:'#303431',seat:'#41634e',prop:'second'},
- {name:'3등칸',start:3300,end:4400,wall:'#34302b',seat:'#815638',prop:'third'}
-],npcs:[
- {id:'witness',name:'윤 형사',role:'1등칸 승객 · 목격자',x:590,color:'#657a7b',portrait:'#a7a089',lines:['급행열차가 터널에 들어간 순간이었어요. 1등칸에서 비명 소리가 들렸습니다.','시신 옆에서 이 승차권 조각을 발견했어요.'],choices:['객실에 누가 드나들었습니까?','그 승차권을 확인하겠습니다.'],responses:['식당칸 직원이 사건 직전에 1등칸으로 향했어요.','승차권의 좌석 번호가 일부 찢겨 나갔습니다.']},
- {id:'keeper',name:'강 요리사',role:'식당칸 직원',x:1580,color:'#8c6a4f',portrait:'#bd956c',lines:['사건이 났을 때 저는 식당칸에서 주문을 받고 있었습니다.','하지만 잠시 자리를 비운 건 사실입니다.'],choices:['그때 어디에 있었죠?','피해자와 아는 사이였습니까?'],responses:['물품 보관실에서 와인 상자를 찾고 있었어요.','열차에 타기 전부터 알고 지낸 사이입니다.']},
- {id:'guard',name:'최 순경',role:'2등칸 차장',x:2680,color:'#596473',portrait:'#aaa493',lines:['2등칸 통로에서 젖은 구두 자국이 발견됐습니다.','발자국은 뒤쪽 3등칸까지 이어져요.'],choices:['발자국 크기를 기록해 주세요.','3등칸 승객을 조사하겠습니다.'],responses:['남성용 구두, 왼발에만 진흙이 묻어 있습니다.','통로 끝에서 수상한 승객을 봤다는군요.']},
- {id:'passenger',name:'한 승객',role:'3등칸 승객',x:3820,color:'#665c52',portrait:'#b49a7c',lines:['저는 아무것도 못 봤어요. 밤새 잠들어 있었으니까요.','잠깐… 그 구두 자국, 제 좌석 앞에서 끝났나요?'],choices:['신발을 확인해도 될까요?','왜 그렇게 놀라셨죠?'],responses:['물론이죠. 저는 이 열차에 탄 뒤 한 번도 내리지 않았어요.','아까 누군가 좌석 밑에 무언가를 밀어 넣는 걸 봤습니다.']}
-]};
-const canvas=document.querySelector('#world'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
-const $=s=>document.querySelector(s),dialogueEl=$('#dialogue'),nearbyEl=$('#nearby'),optionsEl=$('#options');
-$('#closeDialogue').addEventListener('click',closeDialogue);
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-function nearestNpc(){let best=null,dist=Infinity;for(const n of world.npcs){const d=Math.abs(n.x-state.playerX);if(d<88&&d<dist){best=n;dist=d}}return best}
-function update(dt){const typingBlocked=dialogueEl.classList.contains('open');if(!typingBlocked){let dir=(keys.has('d')?1:0)-(keys.has('a')?1:0);state.playerX=clamp(state.playerX+dir*world.player.speed*dt,world.player.w/2,world.width-world.player.w/2)}
- // Camera follows at the left third after it has room to scroll; clamps at both map edges.
- state.cameraX=clamp(state.playerX-world.viewW/3,0,world.width-world.viewW);state.nearbyNpc=nearestNpc();nearbyEl.classList.toggle('show',!!state.nearbyNpc&&!dialogueEl.classList.contains('open'));const car=world.cars.find(c=>state.playerX>=c.start&&state.playerX<c.end)||world.cars.at(-1);$('#chapter').textContent=car.name+'  /  23:47';
-}
-const keys=new Set();window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['a','d','f','enter','arrowleft','arrowright','arrowup','arrowdown',' '].includes(k))e.preventDefault();if(k==='a'||k==='d')keys.add(k);if((k==='f'||k==='enter')&&!e.repeat)activate()});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
-function activate(){if(dialogueEl.classList.contains('open')){if(state.typingFinish){state.typingFinish();return}if(state.dialogueStep==='choice'){choose(state.choiceIndex);return}closeDialogue();return}if(state.nearbyNpc)openDialogue(state.nearbyNpc)}
-function openDialogue(npc){state.dialogueNpc=npc;state.dialogueStep='typing';state.choiceIndex=0;$('#conversation').replaceChildren();optionsEl.replaceChildren();optionsEl.style.display='none';dialogueEl.classList.remove('open');void dialogueEl.offsetWidth;dialogueEl.classList.add('open');say(npc,npc.lines[0],false,()=>renderOptions(npc.choices))}
-function renderOptions(choices){optionsEl.replaceChildren();choices.forEach((label,i)=>{const b=document.createElement('button');b.className='option'+(i===state.choiceIndex?' selected':'');b.innerHTML='<b>'+(i+1)+'</b>'+label;b.onclick=()=>choose(i);optionsEl.append(b)});optionsEl.style.display='flex';state.dialogueStep='choice';$('#continue').textContent='↑ ↓ 선택  ·  F 확정'}
-function choose(i){const n=state.dialogueNpc;state.choiceIndex=clamp(i,0,n.choices.length-1);state.dialogueStep='typing';optionsEl.style.display='none';say(n,n.choices[state.choiceIndex],true,()=>say(n,n.responses[state.choiceIndex],false,()=>renderOptions(n.choices)))}
-function say(npc,text,player,done){const row=document.createElement('div');row.className='message'+(player?' player':'');if(!player){const p=document.createElement('canvas');p.className='portrait';p.width=52;p.height=52;drawPortrait(npc,p);row.appendChild(p)}const bubble=document.createElement('div');bubble.className='speech';bubble.setAttribute('aria-label',player?'플레이어 대사':npc.name+'의 대사');row.appendChild(bubble);const log=$('#conversation');log.appendChild(row);const chars=Array.from(text);let i=0;let finished=false;const finish=()=>{if(finished)return;finished=true;clearTimeout(state.typingTimer);bubble.textContent=text;state.typingFinish=null;state.typingTimer=0;done?.()};state.typingFinish=finish;const type=()=>{if(finished)return;const follow=log.scrollHeight-log.scrollTop-log.clientHeight<60;bubble.textContent=chars.slice(0,++i).join('');if(follow)log.scrollTop=log.scrollHeight;if(i<chars.length)state.typingTimer=setTimeout(type,30);else finish()};type()}
-function closeDialogue(){if(state.typingTimer)clearTimeout(state.typingTimer);state.typingTimer=0;state.typingFinish=null;dialogueEl.classList.remove('open');state.dialogueNpc=null;state.dialogueStep='';optionsEl.style.display='flex';}
-window.addEventListener('keydown',e=>{if(!dialogueEl.classList.contains('open'))return;const k=e.key.toLowerCase();if(k==='escape'){closeDialogue();return}if(state.dialogueStep==='choice'){if(k==='arrowleft'||k==='arrowup'){state.choiceIndex=(state.choiceIndex+state.dialogueNpc.choices.length-1)%state.dialogueNpc.choices.length;renderOptions(state.dialogueNpc.choices)}if(k==='arrowright'||k==='arrowdown'){state.choiceIndex=(state.choiceIndex+1)%state.dialogueNpc.choices.length;renderOptions(state.dialogueNpc.choices)}if(k>='1'&&k<='9')choose(Number(k)-1)}});
-function drawPortrait(n,canvas){const c=canvas.getContext('2d');c.clearRect(0,0,52,52);c.fillStyle='#242725';c.fillRect(0,0,52,52);c.fillStyle='#34352e';c.fillRect(4,4,44,44);c.fillStyle=n.portrait;c.fillRect(16,10,21,23);c.fillStyle='#35322c';c.fillRect(14,8,25,9);c.fillRect(14,13,5,8);c.fillRect(35,13,5,7);c.fillStyle='#171a19';c.fillRect(19,20,4,3);c.fillRect(30,20,4,3);c.fillStyle='#776453';c.fillRect(24,26,6,2);c.fillStyle=n.color;c.fillRect(9,35,35,15);c.fillStyle='#d3c49c';c.fillRect(23,35,6,8);c.fillStyle='#171a19';c.fillRect(0,47,52,5)}
-function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
-function draw(){const cam=state.cameraX;ctx.clearRect(0,0,960,540);rect(0,0,960,450,'#171d20'); // distant rainy sky
- // cloud bands and distant skyline
- for(let i=0;i<8;i++){const x=((i*173-cam*.12)%1120+1120)%1120-80;rect(x,74+(i%3)*21,120+(i%2)*42,4,'#354044');rect(x+26,84+(i%3)*21,90,3,'#293437')}
- for(let i=0;i<14;i++){const x=i*204-cam*.25;const sx=((x%1180)+1180)%1180-100;const h=75+(i*47%105);rect(sx,295-h,118,h,'#20282b');rect(sx+8,300-h,102,h,'#252d2e');for(let wy=314-h;wy<292;wy+=20)for(let wx=sx+17;wx<sx+110;wx+=23)rect(wx,wy,8,10,(i+wx+wy)%3?'#86734c':'#394447')}
- // far alley glow
- const glow=ctx.createRadialGradient(646-cam*.14,333,6,646-cam*.14,333,200);glow.addColorStop(0,'#92734830');glow.addColorStop(1,'#92734800');ctx.fillStyle=glow;ctx.fillRect(0,140,960,310);
- // Train compartments: rainy city remains visible through the windows.
- const activeCar=world.cars.find(c=>state.playerX>=c.start&&state.playerX<c.end)||world.cars.at(-1);
- for(const car of world.cars){const sx=car.start-cam,ex=car.end-cam;if(ex<0||sx>960)continue;
-  rect(sx,0,car.end-car.start,153,'#1b2021');rect(sx,145,car.end-car.start,18,'#5b4835');rect(sx,350,car.end-car.start,100,car.wall);rect(sx,353,car.end-car.start,5,'#786249');rect(sx,435,car.end-car.start,15,'#241f1b');
-  for(let wx=car.start+42;wx<car.end-30;wx+=188){const x=wx-cam;rect(x-5,165,148,190,'#725d42');rect(x,170,138,178,'#a5a08b');rect(x+5,175,128,166,'#242d30');rect(x+8,180,122,157,'#344044');rect(x+8,250,122,2,'#586165');rect(x+66,175,3,166,'#74654e');rect(x-7,164,152,7,'#b39868');rect(x-7,348,152,8,'#9b8259');rect(x+12,180,2,150,'#c2c0aa24');}
-  // Long bench seats, adjusted for the four carriage types.
-  for(let wx=car.start+88;wx<car.end-90;wx+=360){const x=wx-cam;if(x>1010||x<-220)continue;
-   if(car.prop==='dining'){rect(x,379,172,9,'#40372c');rect(x+7,388,7,46,'#2a2520');rect(x+158,388,7,46,'#2a2520');rect(x+22,357,5,22,'#786246');rect(x+137,357,5,22,'#786246');rect(x+17,352,138,6,'#d0b889');rect(x+65,347,42,5,'#e0d4b2');rect(x+80,344,10,4,'#9d5041');}
-   else if(car.prop==='suite'){ // Broad, low-set first-class seats facing one another across a table.
-    rect(x+5,354,72,39,'#562b35');rect(x+5,338,15,47,'#713744');rect(x+9,342,7,37,'#a15b63');rect(x+20,358,51,6,'#914b58');rect(x+13,387,65,11,'#803d4b');rect(x+13,398,8,35,'#33271f');rect(x+69,398,8,35,'#33271f');rect(x+21,360,49,3,'#c17a7b');rect(x+7,382,12,7,'#6a3440');
-    rect(x+99,354,72,39,'#562b35');rect(x+156,338,15,47,'#713744');rect(x+160,342,7,37,'#a15b63');rect(x+103,358,51,6,'#914b58');rect(x+98,387,65,11,'#803d4b');rect(x+100,398,8,35,'#33271f');rect(x+156,398,8,35,'#33271f');rect(x+103,360,49,3,'#c17a7b');rect(x+159,382,12,7,'#6a3440');
-    rect(x+77,382,22,6,'#a98a5b');rect(x+79,388,3,14,'#4b3929');rect(x+94,388,3,14,'#4b3929');rect(x+84,377,8,5,'#e0d4b2');
-   }else{rect(x,379,174,17,car.seat);rect(x+7,396,8,38,'#302922');rect(x+159,396,8,38,'#302922');rect(x+9,367,156,12,car.seat);rect(x+14,370,146,2,'#c4b48a66');if(car.prop==='third'){rect(x+17,357,24,8,'#a08b69');rect(x+124,361,32,4,'#493f35');}}
-  }
-  // Car number plates and connecting vestibule doors mark each long section.
-  rect(sx+18,124,118,20,'#393328');rect(sx+23,128,108,12,'#c2a36c');ctx.fillStyle='#332c22';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText(car.name+'  ·  NIGHT EXPRESS',sx+77,137);
-  if(car.start>0){const dx=sx;rect(dx-20,120,40,330,'#252726');rect(dx-16,127,32,311,'#554936');rect(dx-12,134,24,296,'#302e29');rect(dx-2,260,4,2,'#d4b878');}
- }
- // Train floor; character feet align exactly with the floor tile top.
- rect(0,450,960,90,'#343432');rect(0,450,960,5,'#9b8862');rect(0,455,960,4,'#554b3b');for(let x=-((cam*.9)%130);x<1000;x+=130){rect(x,460,2,80,'#41403b');rect(x+2,501,92,2,'#3b3c39')}
- // rainy reflections
- for(let i=0;i<29;i++){const x=((i*97-cam*.91)%1030+1030)%1030-35;const y=472+(i*31%57);rect(x,y,24+(i%4)*12,2,i%3?'#8c76482b':'#96a4a329')}
- // background wire / rain streaks
- for(let i=0;i<65;i++){const x=(i*83+(state.lastTime*.035|0))%990;const y=(i*59+(state.lastTime*.12|0))%445;rect(x,y,1,7,'#aab5b21b')}
- for(const n of world.npcs)drawCharacter(n.x-cam,world.floorY,n.color,n===state.nearbyNpc?1:0,n===state.nearbyNpc);
- drawCharacter(state.playerX-cam,world.floorY,'#8c7458',0,false,true);
- if(state.nearbyNpc&&!dialogueEl.classList.contains('open')){const sx=state.nearbyNpc.x-cam;const bob=Math.sin(state.lastTime*.006)*2;ctx.beginPath();ctx.arc(sx,world.floorY-83+bob,11,0,Math.PI*2);ctx.fillStyle='#e5c777';ctx.fill();ctx.strokeStyle='#35291c';ctx.lineWidth=2;ctx.stroke();rect(sx-1,world.floorY-90+bob,3,8,'#332a1d');rect(sx-1,world.floorY-79+bob,3,3,'#332a1d')}
- // faint cinematic grain
-}
-function drawCharacter(x,feet,color,pose,active,isPlayer=false){if(x<-60||x>1020)return;const bob=isPlayer&&keys.size?Math.abs(Math.sin(state.lastTime*.018))*2:0;const y=feet-bob;const leg=pose?0:((state.lastTime/380|0)%2?3:0); // shadow
- ctx.fillStyle='#0a0b0b80';ctx.beginPath();ctx.ellipse(x,y+2,18,4,0,0,Math.PI*2);ctx.fill();
- // pixel trench coat / legs
- rect(x-10,y-23,8,21,'#252522');rect(x+2,y-23+leg,8,21-leg,'#292824');rect(x-12,y-4,11,4,'#181a1a');rect(x+2,y-4,12,4,'#181a1a');
- rect(x-14,y-49,28,30,color);rect(x-16,y-44,4,20,color);rect(x+12,y-45,5,22,color);rect(x-13,y-25,26,3,'#292824');rect(x-3,y-44,4,18,'#c2a36b');rect(x-2,y-42,2,3,'#25231e');
- // neck, head, brim + fedora
- rect(x-4,y-55,8,7,'#a98265');rect(x-7,y-69,14,15,'#b99576');rect(x-9,y-68,3,12,'#936d55');rect(x+5,y-66,3,9,'#936d55');rect(x-8,y-73,17,6,'#282725');rect(x-11,y-69,23,3,'#1b1c1b');rect(x-7,y-78,15,6,'#31302b');rect(x-5,y-80,12,3,'#3a3831');rect(x-3,y-63,2,2,'#27211c');
- if(isPlayer){rect(x-14,y-32,4,5,'#d0b276');rect(x+10,y-39,4,8,'#282523');rect(x-13,y-20,4,2,'#b69b68')}
- if(active){ctx.strokeStyle='#dbbe78';ctx.lineWidth=1;ctx.strokeRect(Math.round(x-16),Math.round(y-82),32,84)}
-}
-function frame(t){const dt=state.lastTime?Math.min(.04,(t-state.lastTime)/1000):0;state.lastTime=t;update(dt);draw();requestAnimationFrame(frame)}requestAnimationFrame(frame);
-})();
-</script></body></html>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>밤의 단서 — 픽셀 탐정 RPG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gowun+Dodum&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="game" aria-label="밤의 단서 픽셀 RPG 게임 화면">
+    <!-- 게임 월드 (캔버스) -->
+    <canvas id="world" width="480" height="270" aria-label="옆에서 보는 밤거리"></canvas>
+    <div class="grain"></div>
+    <div class="vignette"></div>
+
+    <!-- 상단 바: 타이틀 + 현재 칸/시각 -->
+    <header class="topbar">
+      <div class="brand">밤의 단서<small>THE NIGHT EXPRESS · MURDER CASE</small></div>
+      <div id="chapter" class="chapter">1등칸 &nbsp; / &nbsp; 23:47</div>
+    </header>
+
+    <!-- 조작 안내 -->
+    <div class="help">
+      <span><i class="key">A</i><i class="key">D</i> 이동</span>
+      <span><i class="key">F</i> 대화 · 선택</span>
+    </div>
+
+    <!-- NPC 근처일 때 표시되는 안내 -->
+    <div id="nearby" class="nearby">F &nbsp; 대화하기</div>
+
+    <!-- 대화 패널 (사건 파일 형태) -->
+    <section id="dialogue" class="dialogue" aria-live="polite">
+      <div class="file-head">
+        <span>CASE FILE &nbsp; / &nbsp; FIELD INTERVIEW</span>
+        <div class="file-actions">
+          <span class="stamp">EVIDENCE</span>
+          <button id="closeDialogue" class="close-dialogue" type="button" aria-label="대화 나가기" title="대화 나가기 (Esc)">×</button>
+        </div>
+      </div>
+      <div class="file-body">
+        <div id="conversation" class="conversation" aria-label="대화 기록"></div>
+        <div id="options" class="options"></div>
+        <div id="continue" class="continue">ESC / × &nbsp; 대화 나가기</div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast"></div>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
